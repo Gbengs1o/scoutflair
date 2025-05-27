@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  overflow-x: hidden;
+  font-family: "Lato", sans-serif;
+}
+
+.scrollbar-custom {
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 0px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  border-radius: 0px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+input {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent;
+}
+
+textarea {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent;
+}
+
+select {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent;
+}
+
+.text-12-14 {
+  @apply text-[0.75rem] leading-[0.9rem];
+}
+
+.text-10-12 {
+  @apply text-[0.625rem] leading-[0.75rem];
+}
+
+.text-12-18 {
+  @apply text-[0.75rem] leading-[1.125rem];
+}
+
+.text-14-15 {
+  @apply text-[0.875rem] leading-[0.9375rem];
+}
+
+.text-14-18 {
+  @apply text-[0.875rem] leading-[1.125rem];
+}
+
+.text-10-15 {
+  @apply text-[0.625rem] leading-[0.9375rem];
+}
+
+.text-8-15 {
+  @apply text-[0.5rem] leading-[0.9375rem];
+}
+
+.text-8-9 {
+  @apply text-[0.5rem] leading-[0.6rem];
+}
+
+.text-48-57 {
+  @apply text-[3rem] leading-[3.6rem];
+}
+
+.text-16-19 {
+  @apply text-[1rem] leading-[1.2rem];
+}
+
+.text-14-16 {
+  @apply text-[0.875rem] leading-[1.05rem];
+}
+
+.text-12-16 {
+  @apply text-[0.75rem] leading-[1.05rem];
+}
+
+.text-14-24 {
+  @apply text-[0.875rem] leading-[1.5rem];
+}
+
+.text-32-38 {
+  @apply text-[2rem] leading-[2.4rem];
+}
+
+.text-28-33 {
+  @apply text-[1.75rem] leading-[2.1rem];
+}
+
+.text-4-4 {
+  @apply text-[0.25rem] leading-[0.3rem];
+}
+
+.text-6-7 {
+  @apply text-[0.375rem] leading-[0.45rem];
+}
+
+.text-6-10 {
+  @apply text-[0.43rem] leading-[0.65rem];
+}
+
+.text-24-28 {
+  @apply text-[1.5rem] leading-[1.8rem];
+}
+
+.text-8-11 {
+  @apply text-[0.5rem] leading-[0.7rem];
+}
+
+.custom-checkbox input[type="checkbox"] {
+  @apply outline-none border border-black bg-white;
+}
+
+.custom-checkbox input[type="checkbox"]:focus {
+  outline: none;
+  border-color: transparent !important;
+}
+
+
+/* david */
+.bg-hero {
+  position: relative;
+  background-image: url('../../public/images/Hero_background.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.bg-aboutframe {
+  position: relative;
+  background-image: url('../../public/images/About_frame.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.groups svg {
+  display: none;
+  /* border: none; */
+}
