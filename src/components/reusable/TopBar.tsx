@@ -23,6 +23,10 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar }) => {
   const role = useCurrentUserStore((state) => state.role);
   const image = useCurrentUserStore((state) => state.image);
   const names = useCurrentUserStore((state) => state.name);
+  // --- ADDED: Assuming 'email' is available in your userStore ---
+  const email = useCurrentUserStore((state) => state.email); 
+  // If 'email' is not in your store, you'll need to add it there first
+  // or replace this with another detail you want to display.
 
   const router = useRouter();
 
@@ -63,7 +67,6 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar }) => {
       )}
 
       {/* Placeholder for other elements like a centered title or search bar */}
-      {/* If you add a title or search, ensure it doesn't collide with the hamburger on smaller screens before lg */}
       <div className="flex-grow">
         {/* Example: Centered Title, hidden on small screens to give space to hamburger and profile */}
         {/* <h1 className="hidden sm:block text-center text-lg font-semibold text-gray-800">Dashboard</h1> */}
@@ -86,15 +89,20 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar }) => {
               radius="rounded-full"
               size="size-8 sm:size-9 lg:size-10" // Responsive avatar size
             />
-            {/* User Name and Role - Conditionally hide role on very small screens if needed */}
+            {/* User Name, Role, and other Details */}
             <div className="hidden xs:flex flex-col gap-0"> {/* 'xs' is a custom breakpoint or use 'sm' */}
-                                                          {/* Or simply let truncation handle it */}
               <h3 className="text-dark font-lato font-bold text-sm truncate max-w-[80px] xs:max-w-[100px] sm:max-w-[120px] lg:max-w-[150px]">
-                {names || "User Name"}
+                {names || "User Name"} {/* Displays user's name */}
               </h3>
               <p className="text-placeholder text-xs font-semibold capitalize truncate max-w-[80px] xs:max-w-[100px] sm:max-w-[120px]">
-                {role ? role.toLowerCase() : "Role"}
+                {role ? role.toLowerCase() : "Role"} {/* Displays user's role (a detail) */}
               </p>
+              {/* --- ADDED: Display user email if available (another detail) --- */}
+              {email && (
+                <p className="text-gray-500 text-xs truncate max-w-[80px] xs:max-w-[100px] sm:max-w-[120px]">
+                  {email}
+                </p>
+              )}
             </div>
           </div>
 
@@ -108,6 +116,7 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar }) => {
               >
                 Switch to {role === "SCOUT" ? "Player" : role === "PLAYER" ? "Scout" : ""}
               </button>
+              {/* You could add more dropdown items here, like "Profile Settings", "Logout", etc. */}
             </div>
           )}
         </div>
