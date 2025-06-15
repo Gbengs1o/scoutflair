@@ -1,15 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react"; // Import useState and useEffect
-
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-
 import Field from "@/public/dashboard/player/field.jpeg";
-
-import {
-  useCurrentUserStore,
-  // usePlayerDataStore, // We'll use local state for the dynamic data
-} from "@/stores/userStore";
+import { useCurrentUserStore } from "@/stores/userStore";
 import ProfileImageOrTextAvatar from "@/components/reusable/ProfileImageOrTextAvatar";
 
 // --- Helper functions to generate random data ---
@@ -18,10 +12,12 @@ import ProfileImageOrTextAvatar from "@/components/reusable/ProfileImageOrTextAv
 const roles = ["Goalkeeper", "Defender", "Midfielder", "Forward", "Winger"];
 
 // Function to get a random item from an array
-const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+// CORRECTED: Added generic types. <T> means this function can work with any type of array.
+const getRandomItem = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 // Function to get a random number in a given range (inclusive)
-const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+// CORRECTED: Added 'number' types to the parameters and the return value.
+const getRandomNumber = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
 
 const Banner = () => {
@@ -58,6 +54,7 @@ const Banner = () => {
         className="w-full h-44 object-cover"
         width={300}
         height={120}
+        priority // Consider adding priority if this is an "above the fold" image
       />
       <div className="w-full flex flex-col relative pt-12 pb-6">
         <div className="absolute -top-6 left-4 -translate-y-1/2">
