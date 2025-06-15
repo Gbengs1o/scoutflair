@@ -5,12 +5,18 @@ import Posts from "../../../reusable/post/Posts";
 
 const Profile = () => {
   return (
-    <div className="w-full flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 md:p-6">
+    // The padding can be adjusted for mobile if needed, e.g., p-4 lg:p-6
+    <div className="w-full flex flex-col gap-6 p-4 md:p-6">
       <Banner />
-      <div className="w-full flex flex-col lg:grid lg:grid-cols-[1fr_2fr] gap-4 sm:gap-6">
+
+      {/* This is the main layout container for Bio and Posts */}
+      <div className="w-full flex flex-col lg:grid lg:grid-cols-[1fr_2fr] gap-6">
+        
+        {/* On large screens (lg), this div becomes sticky. On smaller screens, it's a normal div. */}
         <div className="lg:sticky lg:top-6 lg:self-start">
           <Bio />
         </div>
+
         <Posts currentPlayer={true} />
       </div>
     </div>

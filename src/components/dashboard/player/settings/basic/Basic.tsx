@@ -135,7 +135,7 @@ const Basic = () => {
       setFieldValue("lastName", names[1]);
       setFieldValue("image", image);
     }
-  }, [currentUser]);
+  }, [currentUser, setFieldValue]);
 
   useEffect(() => {
     if (playerData) {
@@ -168,7 +168,7 @@ const Basic = () => {
       setFieldValue("weight", weight);
       setFieldValue("xUrl", xLink);
     }
-  }, [playerData]);
+  }, [playerData, setFieldValue]);
 
   useEffect(() => {
     if (!uploadingPicture && uploadedPicture) {
@@ -208,54 +208,51 @@ const Basic = () => {
 
   return (
     <form method="POST" onSubmit={handleSubmit} className="w-full">
-      <div className="flex flex-col gap-4 sm:gap-6 w-full">
-        {/* Personal Information */}
+      <div className="flex flex-col gap-6 w-full ">
         <div className="space-y-3">
-          <h2 className="text-dark text-xs sm:text-12-14 font-semibold pl-3 sm:pl-5">
+          <h2 className="text-dark text-12-14 font-semibold pl-4 md:pl-5">
             Personal Information
           </h2>
-          <div className="w-full flex flex-col px-3 sm:px-5 gap-4">
-            {/* Full Name */}
-            <div className="w-full flex flex-col lg:grid lg:grid-cols-[0.5fr_1.5fr_1.5fr] lg:place-items-center gap-2 lg:gap-4">
-              <h2 className="text-xs sm:text-14-16 font-semibold text-placeholder">
+          <div className="w-full flex flex-col px-4 md:px-5 gap-4">
+            {/* --- RESPONSIVE GRID --- */}
+            <div className="w-full grid grid-cols-1 lg:grid-cols-[0.5fr_1.5fr_1.5fr] items-start lg:items-center gap-4">
+              <h2 className="text-14-16 font-semibold text-placeholder mb-2 lg:mb-0">
                 Full Name
               </h2>
-              <div className="flex flex-col sm:flex-row gap-2 lg:contents">
-                <div className="flex flex-col">
-                  <input
-                    type="text"
-                    name="firstName"
-                    placeholder="Enter First Name"
-                    value={values.firstName}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
-                  />
-                  {errors.firstName && touched.firstName && (
-                    <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.firstName}</p>
-                  )}
-                </div>
-                <div className="flex flex-col">
-                  <input
-                    type="text"
-                    name="lastName"
-                    placeholder="Enter Last Name"
-                    value={values.lastName}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
-                  />
-                  {errors.lastName && touched.lastName && (
-                    <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.lastName}</p>
-                  )}
-                </div>
-              </div>
+              <>
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="Enter First Name"
+                  value={values.firstName}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                />
+                {errors.firstName && touched.firstName && (
+                  <p className="text-8-9 text-red-500">{errors.firstName}</p>
+                )}
+              </>
+              <>
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Enter Last Name"
+                  value={values.lastName}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                />
+                {errors.lastName && touched.lastName && (
+                  <p className="text-8-9 text-red-500">{errors.lastName}</p>
+                )}
+              </>
             </div>
 
-            {/* Contact */}
-            <div className="w-full flex flex-col lg:grid lg:grid-cols-[0.5fr_1.5fr_1.5fr] lg:place-items-center gap-2 lg:gap-4">
-              <h2 className="text-xs sm:text-14-16 font-semibold text-placeholder">
+            {/* --- RESPONSIVE GRID --- */}
+            <div className="w-full grid grid-cols-1 lg:grid-cols-[0.5fr_1.5fr_1.5fr] items-start lg:items-center gap-4">
+              <h2 className="text-14-16 font-semibold text-placeholder mb-2 lg:mb-0">
                 Contact
               </h2>
-              <div className="flex flex-col sm:flex-row gap-2 lg:contents">
+              <>
                 <input
                   type="email"
                   placeholder="Enter Email"
@@ -263,210 +260,206 @@ const Basic = () => {
                   value={values.email}
                   readOnly
                   onChange={handleChange}
-                  className="w-full rounded-lg border bg-neutral-300 placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                  className="w-full rounded-lg border bg-neutral-300 placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
                 />
-                <div className="flex flex-col">
-                  <input
-                    type="tel"
-                    name="phone"
-                    placeholder="Enter Phone Number"
-                    value={values.phone}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
-                  />
-                  {errors.phone && touched.phone && (
-                    <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.phone}</p>
-                  )}
-                </div>
-              </div>
+              </>
+
+              <>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Enter Phone Number"
+                  value={values.phone}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                />
+                {errors.phone && touched.phone && (
+                  <p className="text-8-9 text-red-500">{errors.phone}</p>
+                )}
+              </>
             </div>
 
-            {/* Avatar */}
-            <div className="w-full flex flex-col lg:grid lg:grid-cols-[0.5fr_1.5fr_1.5fr] lg:place-items-center gap-2 lg:gap-4">
-              <h2 className="text-xs sm:text-14-16 font-semibold text-placeholder">
+            {/* --- RESPONSIVE GRID --- */}
+            <div className="w-full grid grid-cols-1 lg:grid-cols-[0.5fr_1.5fr_1.5fr] items-start lg:items-center gap-4">
+              <h2 className="text-14-16 font-semibold text-placeholder mb-2 lg:mb-0">
                 Avatar
               </h2>
-              <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
-                <div className="w-full flex gap-3 items-center">
-                  {fileImageData ? (
-                    <Image
-                      src={fileImageData}
-                      alt="user image"
-                      className="rounded-full size-11 object-cover"
-                      width={44}
-                      height={44}
-                    />
-                  ) : (
-                    <ProfileImageOrTextAvatar
-                      image={values.image}
-                      name={values.firstName}
-                      radius="rounded-full"
-                      size="size-11"
-                    />
-                  )}
-                  <div className="flex flex-wrap gap-2">
-                    <div
-                      onClick={() => fileRef.current?.click()}
-                      className="text-primary-2 border border-primary-2 px-3 py-1 rounded-md text-[10px] sm:text-10-12 cursor-pointer font-bold"
-                    >
-                      Change
-                    </div>
-                    <div
-                      onClick={() => {
-                        setFieldValue("image", "");
-                        setFileImageData("");
-                      }}
-                      className="text-error border border-error px-3 py-1 rounded-md text-[10px] sm:text-10-12 cursor-pointer font-bold"
-                    >
-                      Remove
-                    </div>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileRef}
-                    style={{ display: "none" }}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.readAsDataURL(file);
-                        reader.onload = () => {
-                          setFieldValue("image", file);
-                          setFile(file);
-                          setFileImageData(reader.result as string);
-                        };
-                      }
-                    }}
+              {/* --- FLEX WRAP FOR BUTTONS --- */}
+              <div className="w-full flex flex-wrap gap-3 items-center">
+                {fileImageData ? (
+                  <Image
+                    src={fileImageData}
+                    alt="user image"
+                    className="rounded-full size-11 object-cover"
+                    width={44}
+                    height={44}
                   />
-                </div>
-                <div className="flex flex-col">
-                  <input
-                    type="date"
-                    name="dob"
-                    placeholder="Enter Date Of Birth"
-                    value={values.dob}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                ) : (
+                  <ProfileImageOrTextAvatar
+                    image={values.image}
+                    name={values.firstName}
+                    radius="rounded-full"
+                    size="size-11"
                   />
-                  {errors.dob && touched.dob && (
-                    <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.dob}</p>
-                  )}
+                )}
+                <div
+                  onClick={() => fileRef.current?.click()}
+                  className="text-primary-2 border border-primary-2 px-3 py-1 rounded-md text-10-12 cursor-pointer font-bold"
+                >
+                  Change
                 </div>
+                <div
+                  onClick={() => {
+                    setFieldValue("image", "");
+                    setFileImageData("");
+                  }}
+                  className="text-error border border-error px-3 py-1 rounded-md text-10-12 cursor-pointer font-bold"
+                >
+                  Remove
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileRef}
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.readAsDataURL(file);
+                      reader.onload = () => {
+                        setFieldValue("image", file);
+                        setFile(file);
+                        setFileImageData(reader.result as string);
+                      };
+                    }
+                  }}
+                />
               </div>
+              <>
+                <input
+                  type="date"
+                  name="dob"
+                  placeholder="Enter Date Of Birth"
+                  value={values.dob}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                />
+                {errors.dob && touched.dob && (
+                  <p className="text-8-9 text-red-500">{errors.dob}</p>
+                )}
+              </>
             </div>
 
-            {/* Bio Data */}
-            <div className="w-full flex flex-col lg:grid lg:grid-cols-[0.5fr_1.5fr_1.5fr] lg:place-items-center gap-2 lg:gap-4">
-              <h2 className="text-xs sm:text-14-16 font-semibold text-placeholder">
+            {/* --- RESPONSIVE GRID --- */}
+            <div className="w-full grid grid-cols-1 lg:grid-cols-[0.5fr_1.5fr_1.5fr] items-start lg:items-center gap-4">
+              <h2 className="text-14-16 font-semibold text-placeholder mb-2 lg:mb-0">
                 Bio Data
               </h2>
-              <div className="flex flex-col sm:flex-row gap-2 lg:contents">
-                <div className="flex flex-col">
-                  <input
-                    type="text"
-                    name="height"
-                    placeholder="Enter Height in cm"
-                    value={values.height}
-                    onChange={(e) => {
-                      const res = e.target.value.trim();
-                      if (isNaN(Number(res))) return;
-                      setFieldValue("height", res);
-                    }}
-                    className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
-                  />
-                  {errors.height && touched.height && (
-                    <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.height}</p>
-                  )}
-                </div>
-                <div className="flex flex-col">
-                  <input
-                    type="text"
-                    name="weight"
-                    placeholder="Enter Weight in kg"
-                    value={values.weight}
-                    onChange={(e) => {
-                      const res = e.target.value.trim();
-                      if (isNaN(Number(res))) return;
-                      setFieldValue("weight", res);
-                    }}
-                    className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
-                  />
-                  {errors.weight && touched.weight && (
-                    <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.weight}</p>
-                  )}
-                </div>
-              </div>
+              <>
+                <input
+                  type="text"
+                  name="height"
+                  placeholder="Enter Height in cm"
+                  value={values.height}
+                  onChange={(e) => {
+                    const res = e.target.value.trim();
+                    if (isNaN(Number(res))) return;
+                    setFieldValue("height", res);
+                  }}
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                />
+                {errors.height && touched.height && (
+                  <p className="text-8-9 text-red-500">{errors.height}</p>
+                )}
+              </>
+              <>
+                <input
+                  type="text"
+                  name="weight"
+                  placeholder="Enter Weight in kg"
+                  value={values.weight}
+                  onChange={(e) => {
+                    const res = e.target.value.trim();
+                    if (isNaN(Number(res))) return;
+                    setFieldValue("weight", res);
+                  }}
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                />
+                {errors.weight && touched.weight && (
+                  <p className="text-8-9 text-red-500">{errors.weight}</p>
+                )}
+              </>
             </div>
 
-            {/* Biography */}
             <div className="w-full">
               <textarea
                 name="biography"
                 placeholder="Enter Biography"
                 value={values.biography}
                 onChange={handleChange}
-                className="w-full rounded-lg border resize-none bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-20 p-2"
+                className="w-full rounded-lg border resize-none bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-20 p-2"
               />
               {errors.biography && touched.biography && (
-                <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.biography}</p>
+                <p className="text-8-9 text-red-500">{errors.biography}</p>
               )}
             </div>
-
-            {/* Address */}
             <div className="w-full">
               <textarea
                 name="address"
                 placeholder="Enter Address"
                 value={values.address}
                 onChange={handleChange}
-                className="w-full rounded-lg border resize-none bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-20 p-2"
+                className="w-full rounded-lg border resize-none bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-20 p-2"
               />
               {errors.address && touched.address && (
-                <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.address}</p>
+                <p className="text-8-9 text-red-500">{errors.address}</p>
               )}
             </div>
           </div>
         </div>
 
-        {/* Team Information */}
         <div className="space-y-3">
-          <h2 className="text-dark text-xs sm:text-12-14 font-semibold pl-3 sm:pl-5">
+          <h2 className="text-dark text-12-14 font-semibold pl-4 md:pl-5">
             Team Information
           </h2>
-          <div className="w-full flex flex-col px-3 sm:px-5 gap-4">
-            <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-4">
-              <input
-                type="text"
-                name="team"
-                placeholder="Enter Current Team"
-                value={values.team}
-                onChange={handleChange}
-                readOnly
-                className="w-full rounded-lg border bg-neutral-300 placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
-              />
-              <div className="flex flex-col">
+          <div className="w-full flex flex-col px-4 md:px-5 gap-4">
+            {/* --- RESPONSIVE GRID --- */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+              <>
+                <input
+                  type="text"
+                  name="team"
+                  placeholder="Enter Current Team"
+                  value={values.team}
+                  onChange={handleChange}
+                  readOnly
+                  className="w-full rounded-lg border bg-neutral-300 placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                />
+              </>
+              <>
                 <input
                   type="text"
                   name="jersey"
                   placeholder="Enter Jersey Number"
                   value={values.jersey}
                   onChange={handleChange}
-                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
                 />
                 {errors.jersey && touched.jersey && (
-                  <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.jersey}</p>
+                  <p className="text-8-9 text-red-500">{errors.jersey}</p>
                 )}
-              </div>
+              </>
             </div>
 
-            <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-4">
-              <div className="flex flex-col">
+            {/* --- RESPONSIVE GRID --- */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+              <>
                 <select
                   name="position"
                   value={values.position}
                   onChange={handleChange}
-                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
                 >
                   <option value="">Select Position</option>
                   {positions.map((position) => (
@@ -476,16 +469,16 @@ const Basic = () => {
                   ))}
                 </select>
                 {errors.position && touched.position && (
-                  <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.position}</p>
+                  <p className="text-8-9 text-red-500">{errors.position}</p>
                 )}
-              </div>
+              </>
 
-              <div className="flex flex-col">
+              <>
                 <select
                   name="foot"
                   value={values.foot}
                   onChange={handleChange}
-                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                  className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
                 >
                   <option value="">Select Foot</option>
                   {["Left", "Right", "Both"].map((foot) => (
@@ -495,27 +488,27 @@ const Basic = () => {
                   ))}
                 </select>
                 {errors.foot && touched.foot && (
-                  <p className="text-[8px] sm:text-8-9 text-red-500 mt-1">{errors.foot}</p>
+                  <p className="text-8-9 text-red-500">{errors.foot}</p>
                 )}
-              </div>
+              </>
             </div>
           </div>
         </div>
 
-        {/* Social Information */}
         <div className="space-y-3">
-          <h2 className="text-dark text-xs sm:text-12-14 font-semibold pl-3 sm:pl-5">
+          <h2 className="text-dark text-12-14 font-semibold pl-4 md:pl-5">
             Social Information
           </h2>
-          <div className="w-full flex flex-col px-3 sm:px-5 gap-4">
-            <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <div className="w-full flex flex-col px-4 md:px-5 gap-4">
+            {/* --- RESPONSIVE GRID --- */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
                 name="xUrl"
                 placeholder="Enter Twitter URL"
                 value={values.xUrl}
                 onChange={handleChange}
-                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               <input
                 type="text"
@@ -523,18 +516,19 @@ const Basic = () => {
                 placeholder="Enter Instagram URL"
                 value={values.igUrl}
                 onChange={handleChange}
-                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
             </div>
 
-            <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-4">
+            {/* --- RESPONSIVE GRID --- */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
                 name="fbUrl"
                 placeholder="Enter Facebook URL"
                 value={values.fbUrl}
                 onChange={handleChange}
-                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               <input
                 type="text"
@@ -542,17 +536,16 @@ const Basic = () => {
                 placeholder="Enter Tiktok URL"
                 value={values.ttUrl}
                 onChange={handleChange}
-                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-xs sm:text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
             </div>
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="w-full px-3 sm:px-6 my-6 sm:my-10">
+        <div className="w-full px-4 md:px-6 my-10">
           <button
             type="submit"
-            className="bg-primary-2 w-full h-12 text-white text-xs sm:text-14-16 font-bold rounded-lg py-2"
+            className="bg-primary-2 w-full h-12 text-white text-14-16 font-bold rounded-lg py-2"
           >
             {loadingUpdatePlayer || uploadingPicture ? (
               <Loader color="white.6" />

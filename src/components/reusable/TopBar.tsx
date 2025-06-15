@@ -1,122 +1,105 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-import { HiMenuAlt1 } from "react-icons/hi"; // Hamburger Icon Example
-// import { IoMdNotificationsOutline } from "react-icons/io"; // If you re-enable
-// import { IoSearchOutline } from "react-icons/io5"; // If you re-enable
+import { IoMdNotificationsOutline } from "react-icons/io";
+import { IoSearchOutline, IoChevronDownCircleOutline } from "react-icons/io5";
 
 import ProfileImageOrTextAvatar from "./ProfileImageOrTextAvatar";
 import { useCurrentUserStore } from "@/stores/userStore";
 import { Urls } from "@/constants/constants";
 
-interface TopBarProps {
-  onToggleSidebar?: () => void;
-}
-
-const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar }) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
+const TopBar: React.FC<{ toggleSidebar: () => void }> = ({
+  toggleSidebar,
+}) => {
+  const [show, setShow] = React.useState(false);
+  const toggle = () => setShow((prev) => !prev);
   const role = useCurrentUserStore((state) => state.role);
   const image = useCurrentUserStore((state) => state.image);
   const names = useCurrentUserStore((state) => state.name);
-  // --- ADDED: Assuming 'email' is available in your userStore ---
-  const email = useCurrentUserStore((state) => state.email); 
-  // If 'email' is not in your store, you'll need to add it there first
-  // or replace this with another detail you want to display.
 
   const router = useRouter();
 
-  const toggleDropdown = () => setShowDropdown((prev) => !prev);
-
-  const switchRoleAndCloseDropdown = () => {
+  const switchRole = () => {
     if (role === "SCOUT") {
+      setShow(false);
       router.replace(Urls.PLAYER_SPOTLIGHT);
     } else if (role === "PLAYER") {
+      setShow(false);
       router.replace(Urls.SCOUT_OVERVIEW);
     }
-    setShowDropdown(false);
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownRef]);
-
   return (
-    <div className="flex justify-between items-center w-full bg-white shadow-custom h-16 px-4 sm:px-5 lg:px-6"> {/* Responsive padding for consistency with layout */}
-      {/* Hamburger Menu Icon (Mobile & Tablet) */}
-      {onToggleSidebar && (
-        <button
-          onClick={onToggleSidebar}
-          className="text-gray-600 hover:text-gray-800 focus:outline-none lg:hidden p-2 -ml-2" // Changed md:hidden to lg:hidden
-          aria-label="Open sidebar"
+    <div className="flex items-center w-full bg-white shadow-custom h-16 px-4 sm:px-6">
+      {/* Hamburger Menu - visible on mobile/tablet */}
+      <button
+        onClick={toggleSidebar}
+        className="text-gray-700 p-2 -ml-2 lg:hidden"
+        aria-label="Open sidebar"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6"
         >
-          <HiMenuAlt1 className="w-6 h-6" />
-        </button>
-      )}
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          />
+        </svg>
+      </button>
 
-      {/* Placeholder for other elements like a centered title or search bar */}
-      <div className="flex-grow">
-        {/* Example: Centered Title, hidden on small screens to give space to hamburger and profile */}
-        {/* <h1 className="hidden sm:block text-center text-lg font-semibold text-gray-800">Dashboard</h1> */}
-      </div>
-
-
-      {/* Right side items: Notifications (commented) & User Profile */}
-      <div className="flex items-center gap-3 sm:gap-4 lg:gap-6"> {/* Responsive gap */}
-        {/* Notifications Icon (Example: visible from sm upwards) */}
-        {/* <div className="hidden sm:block lg:block"> {/* Adjust visibility as needed */}
-        {/*  <IoMdNotificationsOutline className="text-2xl text-black cursor-pointer" />
-        {/* </div> */}
-
-        {/* User Profile Section */}
-        <div className="relative" ref={dropdownRef}>
-          <div className="flex gap-2 sm:gap-3 items-center cursor-pointer" onClick={toggleDropdown}>
-            <ProfileImageOrTextAvatar
-              image={image}
-              name={names}
-              radius="rounded-full"
-              size="size-8 sm:size-9 lg:size-10" // Responsive avatar size
+      {/* Right side content, pushed to the right */}
+      <div className="flex items-center gap-4 sm:gap-8 ml-auto">
+        {/*
+        <div className="relative w-full max-w-xs hidden md:block">
+            <input
+            className="h-10 rounded-full w-full border pl-11 bg-[#F5F6FA] pr-4 text-sm border-border-gray placeholder:text-placeholder font-lato text-dark"
+            placeholder="Search"
             />
-            {/* User Name, Role, and other Details */}
-            <div className="hidden xs:flex flex-col gap-0"> {/* 'xs' is a custom breakpoint or use 'sm' */}
-              <h3 className="text-dark font-lato font-bold text-sm truncate max-w-[80px] xs:max-w-[100px] sm:max-w-[120px] lg:max-w-[150px]">
-                {names || "User Name"} {/* Displays user's name */}
-              </h3>
-              <p className="text-placeholder text-xs font-semibold capitalize truncate max-w-[80px] xs:max-w-[100px] sm:max-w-[120px]">
-                {role ? role.toLowerCase() : "Role"} {/* Displays user's role (a detail) */}
-              </p>
-              {/* --- ADDED: Display user email if available (another detail) --- */}
-              {email && (
-                <p className="text-gray-500 text-xs truncate max-w-[80px] xs:max-w-[100px] sm:max-w-[120px]">
-                  {email}
-                </p>
-              )}
-            </div>
+            <IoSearchOutline className="absolute inset-y-1/2 -translate-y-1/2 left-4 text-xl text-placeholder" />
+        </div>
+        */}
+
+        {/*
+        <div className="w-fit flex gap-8 items-center">
+          <IoMdNotificationsOutline className="text-2xl text-black" />
+        </div>
+        */}
+
+        <div className="flex gap-3 items-center w-fit relative">
+          <ProfileImageOrTextAvatar
+            image={image}
+            name={names}
+            radius="rounded-full"
+            size="size-11"
+          />
+
+          <div className="flex flex-col gap-1 cursor-pointer" onClick={toggle}>
+            <h3 className="text-dark font-lato font-bold text-14-16">
+              {names}
+            </h3>
+            <p className="text-placeholder text-12-14 font-semibold">{role}</p>
           </div>
 
-          {showDropdown && (
+          {show && (
             <div
-              className="absolute top-full mt-2 right-0 z-20 bg-white rounded-lg shadow-xl w-auto min-w-[180px] sm:min-w-[200px] max-w-[240px] overflow-hidden"
+              className="absolute top-full mt-2 right-0 w-48 bg-white rounded-lg shadow-lg z-50"
+              onMouseLeave={() => setShow(false)}
             >
-              <button
-                onClick={switchRoleAndCloseDropdown}
-                className="w-full text-left block px-4 py-3 text-sm text-dark font-lato hover:bg-primary-100 hover:text-primary-600 transition-colors duration-150 ease-in-out"
+              <h3
+                onClick={switchRole}
+                className="hover:bg-primary hover:text-white rounded-lg p-4 text-dark font-lato font-bold text-14-16 cursor-pointer"
               >
-                Switch to {role === "SCOUT" ? "Player" : role === "PLAYER" ? "Scout" : ""}
-              </button>
-              {/* You could add more dropdown items here, like "Profile Settings", "Logout", etc. */}
+                Switch to{" "}
+                {role === "SCOUT" ? "Player" : role === "PLAYER" ? "Scout" : ""}
+              </h3>
             </div>
           )}
         </div>

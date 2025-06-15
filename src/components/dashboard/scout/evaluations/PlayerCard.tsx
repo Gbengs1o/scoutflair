@@ -1,97 +1,171 @@
-"use client";
-
-import ProfileImageOrTextAvatar from "@/components/reusable/ProfileImageOrTextAvatar";
-import { getYearDifference } from "@/functions/dateFunctions";
-import { iScoutPlayersResponse } from "@/hooks/scout"; // Assuming correct type import
-import Link from "next/link";
 import React, { FC } from "react";
+import Link from "next/link";
+import { getYearDifference } from "@/functions/dateFunctions";
+import { iScoutPlayersResponse } from "@/hooks/scout";
 
-const PlayerCard: FC<{ player: iScoutPlayersResponse }> = ({ player }) => {
-  const names = player.fullName.split(" ");
-  const firstName = names[0] || ""; // Handle cases with no first name
-  const lastName = names.slice(1).join(" ") || player.fullName; // Handle single names or multiple last names
+// Helper to generate a random jersey number if one isn't provided
+const getRandomJerseyNumber = () => Math.floor(Math.random() * 98) + 1;
 
-  // Responsive classes for ProfileImageOrTextAvatar
-  // Adjust based on your component and design needs
-  const avatarSizeClasses = "size-20 xs:size-24 sm:size-28"; // e.g., 5rem, 6rem, 7rem (original was 7.25rem)
-  const avatarTextClasses = "text-2xl xs:text-3xl sm:text-4xl"; // Corresponds to size (original text-28-33)
+// SVG Player Avatar Component
+const PlayerAvatar: FC<{ name: string; position: string }> = ({ name, position }) => {
+  const initials = name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+  
+  // Color based on position for visual variety
+  const getPositionColor = (pos: string) => {
+    const positionColors = {
+      'GK': '#10B981', // emerald
+      'DEF': '#3B82F6', // blue
+      'MID': '#F59E0B', // amber
+      'FWD': '#EF4444', // red
+      'ATT': '#EF4444', // red
+    };
+    
+    const posKey = pos.toUpperCase().slice(0, 3);
+    return positionColors[posKey as keyof typeof positionColors] || '#6366F1'; // indigo default
+  };
 
-  // Font size translations (examples)
-  // text-14-16 -> text-xs sm:text-sm
-  // text-16-19 -> text-sm sm:text-base
-  // text-24-28 -> text-xl sm:text-2xl (Jersey)
-  // text-10-12 -> text-[10px] sm:text-xs (AGE/POSITION labels, button text)
-  // text-8-9   -> text-[9px] sm:text-[10px] (AGE/POSITION values - very small, increased slightly)
+  const bgColor = getPositionColor(position);
 
   return (
-    <div className="w-full border border-border-gray/50 rounded-[1rem] bg-white
-                   flex flex-col p-2.5 gap-3
-                   xs:flex-row xs:items-center xs:p-3 xs:gap-3 sm:gap-4"> {/* Stack on smallest, row on xs+, responsive padding & gap. Removed fixed height. */}
+    <div className="relative flex-shrink-0">
+      <svg
+        width="64"
+        height="64"
+        viewBox="0 0 64 64"
+        className="rounded-xl shadow-sm"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* Background circle with position-based color */}
+        <circle cx="32" cy="32" r="32" fill={bgColor} />
+        
+        {/* Player silhouette */}
+        <g fill="rgba(255,255,255,0.3)">
+          {/* Body */}
+          <ellipse cx="32" cy="45" rx="12" ry="15" />
+          {/* Head */}
+          <circle cx="32" cy="22" r="8" />
+          {/* Arms */}
+          <ellipse cx="20" cy="35" rx="4" ry="10" transform="rotate(-20 20 35)" />
+          <ellipse cx="44" cy="35" rx="4" ry="10" transform="rotate(20 44 35)" />
+        </g>
+        
+        {/* Initials overlay */}
+        <text
+          x="32"
+          y="38"
+          textAnchor="middle"
+          className="fill-white font-bold text-lg"
+          style={{ fontSize: '16px', fontFamily: 'system-ui' }}
+        >
+          {initials}
+        </text>
+        
+        {/* Jersey number in corner */}
+        <circle cx="52" cy="12" r="8" fill="rgba(0,0,0,0.2)" />
+        <text
+          x="52"
+          y="16"
+          textAnchor="middle"
+          className="fill-white font-bold text-xs"
+          style={{ fontSize: '10px', fontFamily: 'system-ui' }}
+        >
+          #
+        </text>
+      </svg>
+    </div>
+  );
+};
 
-      {/* Avatar */}
-      <div className="flex-shrink-0 self-center xs:self-auto"> {/* Center avatar when stacked */}
-        <ProfileImageOrTextAvatar
-          name={player.fullName}
-          image={player.imageUrl}
-          size={avatarSizeClasses}
-          radius="rounded-md" // Or keep "rounded" if preferred, rounded-md is common
-          text={avatarTextClasses}
-        />
-      </div>
+const PlayerCard: FC<{ player: iScoutPlayersResponse }> = ({ player }) => {
+  const jerseyNumber = player.jerseyNumber || getRandomJerseyNumber();
+  const playerAge = getYearDifference(new Date(), new Date(player.dob));
 
-      {/* Info Block */}
-      <div className="w-full flex-1 flex flex-col gap-2.5 sm:gap-3 py-1"> {/* flex-1 to take space, responsive gap */}
-
-        {/* Name and Jersey */}
-        <div className="flex w-full items-start justify-between gap-2"> {/* items-start for name block, gap for safety */}
-          <div className="flex flex-col">
-            <p className="text-dark/80 text-xs sm:text-sm"> {/* opacity via /80 */}
-              {firstName}
-            </p>
-            <p className="text-dark font-bold text-sm sm:text-base leading-tight"> {/* leading-tight for compact name */}
-              {lastName}
+  return (
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 hover:scale-[1.02] overflow-hidden">
+      {/* Mobile: Stack vertically, Desktop: Horizontal layout */}
+      <div className="flex flex-col sm:flex-row sm:items-stretch gap-4 p-4">
+        
+        {/* Player Avatar Section */}
+        <div className="flex sm:flex-col items-center sm:items-start gap-3">
+          <PlayerAvatar name={player.fullName} position={player.position} />
+          
+          {/* Jersey number - visible on mobile, hidden on desktop where it's in the avatar */}
+          <div className="sm:hidden flex-1">
+            <p className="text-2xl font-bold text-gray-400 text-right">
+              #{jerseyNumber}
             </p>
           </div>
-          <p className="text-dark font-bold text-lg xs:text-xl sm:text-2xl whitespace-nowrap"> {/* Jersey #, no wrap */}
-            #{player.jerseyNumber || "N/A"}
-          </p>
         </div>
 
-        {/* Age and Position */}
-        <div className="flex w-full justify-around xs:justify-between gap-2"> {/* justify-around for small, between for larger in this section */}
-          {[
-            { label: "AGE", value: getYearDifference(new Date(), new Date(player.dob)) },
-            { label: "POSITION", value: player.position || "N/A" },
-          ].map(item => (
-            <div key={item.label} className="flex flex-col items-center gap-0.5 text-center">
-              <h2 className="font-semibold text-dark/90 text-[10px] sm:text-xs uppercase tracking-wider"> {/* Label style */}
-                {item.label}
-              </h2>
-              <p className="text-dark text-[10px] sm:text-xs"> {/* Value style, increased from 8-9px range */}
-                {item.value}
+        {/* Player Details Section */}
+        <div className="flex-1 space-y-4">
+          
+          {/* Header: Name and Jersey (desktop only) */}
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-bold text-gray-900 text-lg sm:text-xl leading-tight">
+                {player.fullName}
+              </h3>
+              <p className="text-sm text-gray-500 font-medium mt-1">
+                {player.position}
               </p>
             </div>
-          ))}
-        </div>
+            <p className="hidden sm:block text-3xl font-bold text-gray-300">
+              #{jerseyNumber}
+            </p>
+          </div>
 
-        {/* Buttons */}
-        <div className="w-full flex flex-col xs:flex-row items-center gap-2 sm:gap-3 mt-1"> {/* Stack buttons on smallest, row on xs+ */}
-          {[
-            { href: `/dashboard/scout/evaluations/reports?id=${player.playerId}`, label: "Reports" },
-            { href: `/dashboard/scout/evaluations/statistics?id=${player.playerId}`, label: "Statistics" },
-          ].map(link => (
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="text-center sm:text-left">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Age
+              </p>
+              <p className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
+                {playerAge}
+              </p>
+            </div>
+            
+            <div className="text-center sm:text-left">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Position
+              </p>
+              <p className="text-sm font-semibold text-gray-900 mt-1">
+                {player.position}
+              </p>
+            </div>
+            
+            {/* Additional stat placeholder for desktop */}
+            <div className="hidden sm:block text-left">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Status
+              </p>
+              <p className="text-sm font-semibold text-green-600 mt-1">
+                Active
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
             <Link
-              key={link.label}
-              href={link.href}
-              className="w-full text-center border rounded-full border-secondary-3
-                         font-medium text-dark/80
-                         py-1.5 px-2 text-[10px]
-                         sm:py-2 sm:text-xs
-                         hover:bg-secondary-3 hover:text-white transition-colors"
+              href={`/dashboard/scout/evaluations/reports?id=${player.playerId}`}
+              className="flex-1 bg-gradient-to-r from-yellow-100 to-yellow-50 text-yellow-800 text-sm font-semibold px-4 py-2.5 rounded-xl border border-yellow-200 hover:from-yellow-200 hover:to-yellow-100 transition-all duration-200 text-center hover:shadow-md"
             >
-              {link.label}
+              📊 Reports
             </Link>
-          ))}
+            <Link
+              href={`/dashboard/scout/evaluations/statistics?id=${player.playerId}`}
+              className="flex-1 bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 text-sm font-semibold px-4 py-2.5 rounded-xl border border-blue-200 hover:from-blue-200 hover:to-blue-100 transition-all duration-200 text-center hover:shadow-md"
+            >
+              📈 Statistics
+            </Link>
+          </div>
         </div>
       </div>
     </div>

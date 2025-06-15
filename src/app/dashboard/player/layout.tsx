@@ -1,75 +1,105 @@
-// /dashboard/player/PlayerLayout.jsx
 "use client";
 
-import { ReactNode, FC, useState, useEffect } from "react";
+import { ReactNode, FC, useState } from "react"; // <-- Import useState
+
+import SideBar, { iNavItem } from "@/components/reusable/SideBar";
+import TopBar from "@/components/reusable/TopBar";
+
+import SpotlightIcon from "@/public/icons/Spotlight Icon.svg";
+import ProfileIcon from "@/public/icons/Profile Icon.svg";
+import GalleryIcon from "@/public/icons/Gallery Icon.svg";
+import SettingsIcon from "@/public/icons/Settings Icon.svg";
 import { usePathname } from "next/navigation";
-import clsx from 'clsx';
 
-import Sidebar from "./sidebar/Sidebar"; 
-import TopBar from "./TopBar/TopBar";
+interface iAuthLayout {
+  children: ReactNode;
+}
 
-const MOBILE_SIDEBAR_EXPANDED_WIDTH_CLASS = "w-80";
+const items: iNavItem[] = [
+  {
+    name: "Spotlight",
+    icon: SpotlightIcon,
+    link: "/dashboard/player/spotlight",
+  },
+  {
+    name: "Profile",
+    icon: ProfileIcon,
+    link: "/dashboard/player/profile",
+  },
+  {
+    name: "Gallery",
+    icon: GalleryIcon,
+    link: "/dashboard/player/gallery",
+  },
+  {
+    name: "Settings",
+    icon: SettingsIcon,
+    link: "/dashboard/player/settings",
+  },
+];
 
-const PlayerLayout: FC<{ children: ReactNode }> = ({ children }) => {
+const PlayerLayout: FC<iAuthLayout> = ({ children }) => {
+  // --- START OF MODIFICATIONS ---
+
+  // 1. Add state to manage the sidebar's visibility on mobile devices.
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  // 2. Create functions to control the sidebar state.
+  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+  const closeSidebar = () => setSidebarOpen(false);
+
+  // --- END OF MODIFICATIONS ---
+
   const pathName = usePathname();
-  const [isSidebarOpenForMobile, setIsSidebarOpenForMobile] = useState(false);
 
-  const toggleMobileSidebar = () => {
-    setIsSidebarOpenForMobile(prev => !prev);
+  const determineIndex = () => {
+    const current = pathName.split("/")[3];
+    switch (current) {
+      case "spotlight":
+        return 0;
+      case "profile":
+        return 1;
+      case "gallery":
+        return 2;
+      case "settings":
+        return 3;
+    }
+
+    return -1;
   };
 
-  useEffect(() => {
-    if (isSidebarOpenForMobile) setIsSidebarOpenForMobile(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathName]);
-
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    if (isSidebarOpenForMobile) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = originalOverflow;
-    }
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [isSidebarOpenForMobile]);
+  const page = determineIndex();
 
   return (
-    <div className="w-screen h-screen font-lato bg-background-gray flex relative overflow-x-hidden">
-      <div
-        className={clsx(
-          "fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 ease-in-out flex-shrink-0",
-          MOBILE_SIDEBAR_EXPANDED_WIDTH_CLASS,
-          isSidebarOpenForMobile ? "translate-x-0 shadow-xl" : "-translate-x-full",
-          "lg:relative lg:translate-x-0 lg:shadow-none lg:w-auto bg-primary-2"
-        )}
-        // Add aria-hidden for better accessibility when sidebar is off-screen on mobile
-        aria-hidden={!isSidebarOpenForMobile && typeof window !== 'undefined' && window.innerWidth < 1024}
-      >
-        {/* Pass toggleMobileSidebar as onMobileClose to Sidebar */}
-        <Sidebar onMobileClose={toggleMobileSidebar} />
-      </div>
+    // This parent div sets up the main flex container for the page.
+    <div className="flex h-screen w-full bg-background-gray font-lato">
+      {/*
+        3. Pass state and handlers to the SideBar.
+           - `isOpen` controls if the sidebar is visible on mobile.
+           - `onClose` allows the sidebar to close itself (e.g., by clicking the overlay or its close button).
+      */}
+      <SideBar
+        items={items}
+        active={page}
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
+      />
 
-      {isSidebarOpenForMobile && (
-        <div
-          className="fixed inset-0 z-20 bg-black/50 lg:hidden"
-          onClick={toggleMobileSidebar}
-          aria-hidden="true"
-        ></div>
-      )}
+      {/* This div contains the main content (TopBar + children).
+          - `flex-1` makes it take up the remaining space next to the sidebar on large screens.
+          - `h-screen` and `overflow-y-auto` make this section scrollable, not the whole page.
+      */}
+      <div className="flex h-screen flex-1 flex-col overflow-y-auto">
+        {/*
+          4. Pass the toggle handler to the TopBar.
+             This allows the hamburger menu in the TopBar to open/close the sidebar.
+        */}
+        <header className="sticky top-0 z-20">
+          <TopBar toggleSidebar={toggleSidebar} />
+        </header>
 
-      <div className={clsx("flex-1 h-screen flex flex-col overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out")}>
-        <div className="sticky top-0 z-10">
-          {/* Pass toggleMobileSidebar and isSidebarOpenForMobile to TopBar */}
-          <TopBar
-            onToggleSidebar={toggleMobileSidebar}
-            isMobileSidebarOpen={isSidebarOpenForMobile}
-          />
-        </div>
-        <main className="flex-grow p-4 sm:p-5 lg:p-6">
-          {children}
-        </main>
+        {/* The actual page content is rendered here. Added padding for better spacing. */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

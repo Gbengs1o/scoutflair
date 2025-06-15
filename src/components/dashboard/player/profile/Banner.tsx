@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react"; // Import useState and useEffect
 
 import Image from "next/image";
 
@@ -8,45 +8,72 @@ import Field from "@/public/dashboard/player/field.jpeg";
 
 import {
   useCurrentUserStore,
-  usePlayerDataStore,
+  // usePlayerDataStore, // We'll use local state for the dynamic data
 } from "@/stores/userStore";
 import ProfileImageOrTextAvatar from "@/components/reusable/ProfileImageOrTextAvatar";
 
+// --- Helper functions to generate random data ---
+
+// A list of realistic roles
+const roles = ["Goalkeeper", "Defender", "Midfielder", "Forward", "Winger"];
+
+// Function to get a random item from an array
+const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+// Function to get a random number in a given range (inclusive)
+const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+
 const Banner = () => {
+  // We still get the user's static info from the store
   const image = useCurrentUserStore((state) => state.image);
   const name = useCurrentUserStore((state) => state.name);
 
-  const role = usePlayerDataStore((state) => state.role);
-  const jersey = usePlayerDataStore((state) => state.jersey);
-  const age = usePlayerDataStore((state) => state.age);
+  // --- State for our dynamic player data ---
+  // We initialize the state with random values so it looks good on the first render
+  const [role, setRole] = useState(getRandomItem(roles));
+  const [jersey, setJersey] = useState(getRandomNumber(1, 99));
+  const [age, setAge] = useState(getRandomNumber(18, 38)); // Realistic age for a player
 
-  const dob = usePlayerDataStore((state) => state.dob);
+  // This effect will run once when the component mounts
+  useEffect(() => {
+    // Set up an interval to update the data every 15 seconds
+    const intervalId = setInterval(() => {
+      setRole(getRandomItem(roles));
+      setJersey(getRandomNumber(1, 99));
+      setAge(getRandomNumber(18, 38));
+    }, 15000); // 15000 milliseconds = 15 seconds
+
+    // This is a cleanup function.
+    // React runs this when the component is unmounted to prevent memory leaks.
+    return () => clearInterval(intervalId);
+  }, []); // The empty dependency array [] ensures this effect runs only once.
+
 
   return (
     <div className="w-full shadow-custom rounded-[1rem] gap-6 bg-white flex flex-col overflow-hidden">
       <Image
         src={Field}
         alt="field"
-        className="w-full h-32 sm:h-36 md:h-44 object-cover"
+        className="w-full h-44 object-cover"
         width={300}
         height={120}
       />
-      <div className="w-full flex flex-col relative pt-8 sm:pt-10 md:pt-12 pb-4 sm:pb-5 md:pb-6">
-        <div className="absolute -top-4 sm:-top-5 md:-top-6 left-3 sm:left-4 -translate-y-1/2">
+      <div className="w-full flex flex-col relative pt-12 pb-6">
+        <div className="absolute -top-6 left-4 -translate-y-1/2">
           <ProfileImageOrTextAvatar
             image={image}
             name={name}
             radius="rounded-full"
-            size="size-16 sm:size-20 md:size-24 lg:size-28"
-            text="text-sm sm:text-base md:text-lg lg:text-48-57"
+            size="size-28"
+            text="text-48-57"
           />
         </div>
-        <div className="w-full flex flex-col gap-1 sm:gap-2 pl-3 sm:pl-4 pr-3 sm:pr-4">
-          <h2 className="text-lg sm:text-xl md:text-20-24 font-bold text-dark break-words">
-            {name}
-          </h2>
-          <div className="text-placeholder text-xs sm:text-sm md:text-14-16 font-medium">
-            <p className="break-words">
+        <div className="w-full flex flex-col gap-2 pl-4">
+          <h2 className="text-20-24 font-bold text-dark">{name}</h2>
+          <div className="text-placeholder text-14-16 font-medium">
+            <p>
+              {/* These now use our local state variables */}
               {role}, No. {jersey}
             </p>
             <p>{age} yrs</p>

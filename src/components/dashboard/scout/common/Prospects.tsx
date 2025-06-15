@@ -1,90 +1,120 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { GiSwordsEmblem } from "react-icons/gi";
-import { useGetScoutPlayerProspects } from "@/hooks/scout";
-import { Loader } from "@mantine/core";
 
-const Prospects = () => {
-  const { loading, data } = useGetScoutPlayerProspects();
+// --- Data Pools for Random Prospect Generation ---
+const prospectImageUrls = [
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_1795.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_1826.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002582_793_4993.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_1948.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_1973.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_2071.png",
+];
+const firstNames = ["Leo", "Kai", "Jude", "Victor", "Jamal", "Santi", "Liam", "Noah"];
+const lastNames = ["Silva", "Hernandez", "Müller", "Saka", "Rice", "Bello", "Okafor", "Gomez"];
+
+interface Prospect {
+  playerFullName: string;
+  playerImageUrl: string;
+  playerGA: number;
+}
+
+const generateRandomProspects = (): Prospect[] => {
+  const newProspects: Prospect[] = [];
+  const usedIndices = new Set<number>();
+  while (newProspects.length < 3) {
+    let imageIndex = Math.floor(Math.random() * prospectImageUrls.length);
+    if (!usedIndices.has(imageIndex)) {
+      usedIndices.add(imageIndex);
+      newProspects.push({
+        playerFullName: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
+        playerImageUrl: prospectImageUrls[imageIndex],
+        playerGA: Math.floor(Math.random() * 21) + 5,
+      });
+    }
+  }
+  return newProspects;
+};
+
+const TopProspectsCard = () => {
+  const [prospects, setProspects] = useState<Prospect[]>(generateRandomProspects());
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProspects(generateRandomProspects());
+      setKey(prevKey => prevKey + 1);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="w-full h-full shadow-custom rounded-[1rem] 
-                   p-3 sm:p-4 md:py-4 md:px-5 
-                   bg-white flex flex-col 
-                   gap-3 sm:gap-4"> {/* Adjusted padding and added gap */}
-      
-      {/* Loading State */}
-      {loading && (
-        <div className="w-full h-full flex-grow grid place-content-center"> {/* Added flex-grow */}
-          <Loader color="primary.6" />
+    <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-5 sm:p-6 flex flex-col gap-6 min-h-[210px]">
+      {/* --- Header with Readable Text --- */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-lg font-bold text-slate-800">Top Prospects</h2>
+          <p className="text-base text-slate-500">Players with high potential</p>
         </div>
-      )}
+        <div className="bg-green-100 text-green-600 rounded-full p-2 shadow-sm">
+          <GiSwordsEmblem size={24} />
+        </div>
+      </div>
 
-      {/* Content when not loading and data is available */}
-      {!loading && data && (
-        <>
-          {/* Header */}
-          <div className="w-full justify-between items-center flex">
-            <h2 className="text-dark font-bold text-sm sm:text-base md:text-16-19"> {/* Responsive font size */}
-              Top Prospects
-            </h2>
-            <GiSwordsEmblem className="text-dark text-xl sm:text-2xl" /> {/* Responsive icon size */}
-          </div>
-
-          {/* Prospects Grid or Empty State */}
-          {data.length > 0 ? (
-            <div className="w-full grid grid-cols-1 gap-3 
-                            xs:grid-cols-2 
-                            md:grid-cols-3 md:gap-4"> {/* Responsive grid and gap */}
-              {data.map((prospect, index) => (
-                <div
-                  key={index}
-                  className="w-full relative flex flex-col bg-[#FFFAFA] pb-1 rounded-xl h-[4.5rem] sm:h-[4rem] text-dark items-center justify-end pt-6" 
-                  // Slightly increased height on smallest screens, added pt-6 for image space
-                >
-                  <Image
-                    src={prospect.playerImageUrl || "/images/default-player.png"} // Added fallback image
-                    alt={prospect.playerFullName || "Player"}
-                    width={44} // Intrinsic width
-                    height={40} // Intrinsic height
-                    className="w-10 h-9 sm:w-11 sm:h-10 object-cover rounded-full absolute -top-1.5 left-1/2 -translate-x-1/2 border-2 border-white shadow-sm" 
-                    // Centered, responsive size, added border & shadow
-                  />
-                  {/* Ensure custom font sizes are defined, or use Tailwind defaults */}
-                  <p className="text-[10px] leading-tight sm:text-10-12 line-clamp-1 text-center px-1">
-                    {prospect.playerFullName}
-                  </p>
-                  <p className="text-[8px] leading-[10px] sm:text-8-9 text-gray-600"> {/* Slightly larger line-height for tiny font */}
-                    {prospect.playerGA} GA
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            // Empty State Message
-            <div className="w-full flex-grow flex flex-col justify-center items-center text-center py-4"> {/* flex-grow to fill space */}
-              <GiSwordsEmblem className="text-3xl sm:text-4xl text-gray-400 mb-2" />
-              <p className="text-xs sm:text-10-12 text-placeholder">
-                There are no prospects available at the moment.
+      {/* --- Responsive & Corrected Prospect Grid --- */}
+      <div key={key} className="grid grid-cols-3 gap-3 sm:gap-4 animate-fade-in">
+        {prospects.map((prospect, index) => (
+          <div
+            key={index}
+            className="relative bg-slate-50 border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:shadow-md hover:scale-105 hover:border-slate-300 flex flex-col items-center pb-4"
+          >
+            {/* Image is still absolute to pop out */}
+            <Image
+              src={prospect.playerImageUrl}
+              alt={prospect.playerFullName}
+              width={56}
+              height={56}
+              className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-full absolute -top-6 border-4 border-white shadow-lg"
+            />
+            
+            {/* THIS IS THE FIX: A new div with margin-top to push text down */}
+            <div className="flex flex-col items-center text-center mt-8">
+              <p className="text-sm font-semibold text-slate-700 w-full truncate px-1">
+                {prospect.playerFullName}
+              </p>
+              <p className="text-xs font-bold text-green-600 mt-0.5">
+                {prospect.playerGA} GA
               </p>
             </div>
-          )}
-        </>
-      )}
-
-      {/* Fallback if data is null/undefined after loading (e.g., API error) */}
-      {!loading && !data && (
-         <div className="w-full flex-grow flex flex-col justify-center items-center text-center py-4">
-            <GiSwordsEmblem className="text-3xl sm:text-4xl text-gray-400 mb-2" />
-            <p className="text-xs sm:text-10-12 text-placeholder">
-                Could not load prospect data.
-            </p>
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default Prospects;
+// To use the animation, add this to your tailwind.config.js
+/*
+module.exports = {
+  // ...
+  theme: {
+    extend: {
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+    },
+  },
+  // ...
+}
+*/
+
+export default TopProspectsCard;

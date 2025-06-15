@@ -7,29 +7,29 @@ const Languages = () => {
   const languages = ["English (UK)", "English (USA)", "Others"];
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-3 w-full ">
       <div className="flex flex-col">
-        <h2 className="text-dark text-xs sm:text-12-14 font-semibold">
+        <h2 className="text-dark text-12-14 font-semibold">
           Language Settings
         </h2>
-        <p className="text-placeholder text-xs sm:text-10-12 font-semibold">
+        <p className="text-placeholder text-10-12 font-semibold">
           Select your language preferences
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center w-full sm:w-fit">
+      <div className="flex gap-4 items-center w-fit">
         {languages.map((lang, i) => (
           <div
             key={i}
-            className="flex gap-2 items-center w-fit text-xs sm:text-12-14 text-dark font-medium"
+            className="flex gap-1 items-center w-fit text-12-14 text-dark font-medium"
           >
             <input
               type="checkbox"
-              className="custom-checkbox flex-shrink-0"
+              className="custom-checkbox"
               checked={index === i}
               onChange={(e) => setIndex(i)}
             />
-            <p className="whitespace-nowrap">{lang}</p>
+            <p>{lang}</p>
           </div>
         ))}
       </div>

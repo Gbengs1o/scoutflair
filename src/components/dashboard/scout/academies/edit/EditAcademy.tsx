@@ -222,16 +222,16 @@ const EditAcademyContent = () => {
   }, [loading, success]);
 
   return (
-    <div className="w-full p-3 sm:p-4 md:p-6">
+    <div className="w-full p-6">
       <form method="POST" onSubmit={handleSubmit}>
-        <div className="w-full p-4 sm:p-5 md:p-6 flex flex-col gap-4 sm:gap-5 md:gap-6 bg-white shadow-custom rounded-[1rem]">
+        <div className="w-full p-6 flex flex-col gap-6 bg-white shadow-custom rounded-[1rem]">
           <h2 className="text-16-19 text-primary-2 font-semibold">
             Update Academy
           </h2>
           <div>
             <div
               onClick={() => fileRef.current?.click()}
-              className={`w-full h-32 sm:h-36 md:h-40 ${
+              className={`w-full h-40 ${
                 file !== null
                   ? "bg-cover bg-center"
                   : "border-2 border-primary-2 border-dashed"
@@ -264,7 +264,7 @@ const EditAcademyContent = () => {
               <p className="text-8-9 text-red-600">{errors.file}</p>
             )}
           </div>
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+          <div className="w-full grid-cols-2 grid gap-6">
             <div className="w-full flex flex-col gap-1">
               <h2 className="text-12-14 font-semibold text-[#333333]">
                 Academy Name
@@ -331,8 +331,8 @@ const EditAcademyContent = () => {
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
-              {errors.phone && touched.phone && (
-                <p className="text-8-9 text-red-600">{errors.phone}</p>
+              {errors.longitude && touched.longitude && (
+                <p className="text-8-9 text-red-600">{errors.longitude}</p>
               )}
             </div>
             <div className="w-full flex flex-col gap-1">
@@ -443,7 +443,7 @@ const EditAcademyContent = () => {
                   setFieldValue("founded", res);
                 }}
                 onBlur={handleBlur}
-                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
+                className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.founded && touched.founded && (
                 <p className="text-8-9 text-red-600">{errors.founded}</p>
@@ -588,10 +588,10 @@ const EditAcademyContent = () => {
               <p className="text-8-9 text-red-600">{errors.description}</p>
             )}
           </div>
-          <div className="w-full grid place-content-center mt-3 sm:mt-4 md:mt-5">
+          <div className="w-full grid place-content-center mt-5">
             <button
               type="submit"
-              className="w-[160px] sm:w-[180px] grid place-content-center rounded-md h-10 sm:h-11 text-white bg-primary-2 text-sm sm:text-base"
+              className="w-[160px] grid place-content-center rounded-md h-10 text-white bg-primary-2"
             >
               {loading || uploadingLogo ? (
                 <Loader color="white.6" />

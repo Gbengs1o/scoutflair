@@ -4,7 +4,6 @@ import { useAxios } from "@/api/base";
 import { useState, useEffect } from "react";
 
 export interface iLocalPitchResponse {
-  localPitchId: number | undefined;
   address: string;
   createdDate: string;
   id?: number;

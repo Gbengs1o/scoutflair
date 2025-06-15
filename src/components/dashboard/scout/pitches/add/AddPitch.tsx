@@ -36,52 +36,84 @@ const AddPitch = () => {
       longitude: "",
       latitude: "",
       facilities: "",
-      pitchLength: "", // Renamed from 'length' in create call context to match form
+      pitchLength: "",
       width: "",
       year: "",
       surface: "",
       rating: "",
       state: "",
       lga: "",
-      file: "", // This is for error tracking, actual file is in `file` state
+      file: "",
     },
     validate: (values) => {
-      const errors: any = {}; // Consider defining a stricter type for errors
+      const errors: any = {};
 
-      if (!values.name) errors.name = "Required";
-      if (!values.address) errors.address = "Required";
-      if (!values.longitude) errors.longitude = "Required";
-      if (!values.latitude) errors.latitude = "Required";
-      if (!values.facilities) errors.facilities = "Required";
-      if (!values.pitchLength) errors.pitchLength = "Required";
-      if (!values.width) errors.width = "Required";
-      if (!values.year) errors.year = "Required";
-      if (!values.surface) errors.surface = "Required";
-      if (!values.rating) errors.rating = "Required";
-      if (!values.state) errors.state = "Required";
-      if (!values.lga) errors.lga = "Required";
-      if (file === null) errors.file = "Pitch image is required";
+      if (!values.name) {
+        errors.name = "Required";
+      }
+
+      if (!values.address) {
+        errors.address = "Required";
+      }
+
+      if (!values.longitude) {
+        errors.longitude = "Required";
+      }
+
+      if (!values.latitude) {
+        errors.latitude = "Required";
+      }
+
+      if (!values.facilities) {
+        errors.facilities = "Required";
+      }
+
+      if (!values.pitchLength) {
+        errors.pitchLength = "Required";
+      }
+
+      if (!values.width) {
+        errors.width = "Required";
+      }
+
+      if (!values.year) {
+        errors.year = "Required";
+      }
+
+      if (!values.surface) {
+        errors.surface = "Required";
+      }
+
+      if (!values.rating) {
+        errors.rating = "Required";
+      }
+
+      if (!values.state) {
+        errors.state = "Required";
+      }
+
+      if (!values.lga) {
+        errors.lga = "Required";
+      }
+
+      if (file === null) {
+        errors.file = "Required";
+      }
 
       return errors;
     },
-    onSubmit: (formValues) => { // Renamed 'values' to 'formValues' to avoid confusion with outer scope 'values'
-      if (file) { // Ensure file is not null before uploading
-        upload(file);
-      } else {
-        // This case should ideally be caught by validation, but good to double check
-        console.error("Attempted to submit without a file.");
-        // Optionally, set an error message here if not already handled by formik's errors.file
-      }
+    onSubmit: (values, object) => {
+      upload(file!);
     },
   });
 
   useEffect(() => {
-    if (!uploadingLogo && uploadedLogo && data) { // Ensure 'data' (imageUrl) is present
+    if (!uploadingLogo && uploadedLogo) {
       create({
         address: values.address,
         facilities: values.facilities,
         latitude: values.latitude,
-        length: values.pitchLength, // Assuming 'create' expects 'length'
+        length: values.pitchLength,
         lga: values.lga,
         longitude: values.longitude,
         name: values.name,
@@ -90,11 +122,10 @@ const AddPitch = () => {
         width: values.width,
         estYear: values.year,
         rating: values.rating,
-        imageUrl: data, // 'data' from useUploadLogo is the imageUrl
-        localPitchId: undefined, // Or omit if not needed for creation
+        imageUrl: data,
       });
     }
-  }, [uploadingLogo, uploadedLogo, data, create, values]); // Added missing dependencies
+  }, [uploadingLogo, uploadedLogo]);
 
   useEffect(() => {
     if (!loading && success) {
@@ -102,12 +133,12 @@ const AddPitch = () => {
     }
   }, [loading, success]);
 
-  // Ensure this return block is clean and has no hidden characters.
-  // The Vercel log pointed to an error at the start of this div.
   return (
-    <div className="w-full p-6"> {/* Vercel log showed p-3 sm:p-4 md:p-6, using your code's p-6 */}
+    // CHANGE 1: Reduced padding on mobile for the main container
+    <div className="w-full p-4 md:p-6">
       <form method="POST" onSubmit={handleSubmit}>
-        <div className="w-full p-6 flex flex-col gap-6 bg-white shadow-custom rounded-[1rem]">
+        {/* CHANGE 1 (cont.): Reduced padding on mobile for the card */}
+        <div className="w-full p-4 md:p-6 flex flex-col gap-6 bg-white shadow-custom rounded-[1rem]">
           <h2 className="text-16-19 text-primary-2 font-semibold">
             Add Local Pitch
           </h2>
@@ -118,12 +149,16 @@ const AddPitch = () => {
               className={`w-full h-40 ${
                 file !== null
                   ? "bg-cover bg-center"
-                  // It's good practice to ensure background image is actually set via style if using bg-cover with dynamic image
                   : "border-2 border-primary-2 border-dashed"
               } rounded-lg overflow-hidden cursor-pointer flex flex-col justify-center items-center gap-2`}
-              style={file !== null && fileImageData ? { backgroundImage: `url(${fileImageData})` } : {}}
             >
-              {file === null && ( // Only show placeholder if file is null
+              {file !== null ? (
+                <img
+                  src={fileImageData}
+                  alt=""
+                  className="object-cover w-full h-full"
+                />
+              ) : (
                 <>
                   <FaImage className="text-primary-2 text-2xl" />
                   <p className="text-14-16 font-medium text-primary-2">
@@ -131,224 +166,190 @@ const AddPitch = () => {
                   </p>
                 </>
               )}
-              {/* The img tag was removed as background image is now handled by the div style for consistency with bg-cover */}
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileRef}
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                      setFile(file);
+                      setFileImageData(reader.result as string);
+                    };
+                  }
+                }}
+              />
             </div>
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileRef}
-              style={{ display: "none" }}
-              onChange={(e) => {
-                const selectedFile = e.target.files?.[0];
-                if (selectedFile) {
-                  const reader = new FileReader();
-                  reader.onloadend = () => { // Use onloadend for better certainty
-                    setFile(selectedFile);
-                    setFileImageData(reader.result as string);
-                    setFieldValue("file", selectedFile.name); // Update formik about file presence
-                  };
-                  reader.readAsDataURL(selectedFile);
-                }
-              }}
-            />
-            {/* Touched.file might be more accurate than touched.name for file errors */}
-            {errors.file && touched.file && (
-              <p className="text-8-9 text-red-600 mt-1">{errors.file as string}</p>
+            {errors.file && touched.name && (
+              <p className="text-8-9 text-red-600">{errors.file}</p>
             )}
           </div>
-
-          {/* Form Fields Grid */}
+          {/* CHANGE 2: Grid is now 1 column on mobile, and 2 columns on medium screens and up */}
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Pitch Name */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="name" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Pitch Name
-              </label>
+              </h2>
               <input
-                id="name"
                 type="text"
                 name="name"
-                placeholder="Enter pitch name"
+                placeholder=""
                 value={values.name}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.name && touched.name && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.name as string}</p>
+                <p className="text-8-9 text-red-600">{errors.name}</p>
               )}
             </div>
-
-            {/* Address */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="address" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Address
-              </label>
+              </h2>
               <input
-                id="address"
                 type="text"
                 name="address"
-                placeholder="Enter address"
+                placeholder=""
                 value={values.address}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.address && touched.address && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.address as string}</p>
+                <p className="text-8-9 text-red-600">{errors.address}</p>
               )}
             </div>
-            
-            {/* State */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="state" className="text-12-14 font-semibold text-[#333333]">State</label>
+              <h2 className="text-12-14 font-semibold text-[#333333]">State</h2>
               <input
-                id="state"
                 type="text"
                 name="state"
-                placeholder="Enter state"
+                placeholder=""
                 value={values.state}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.state && touched.state && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.state as string}</p>
+                <p className="text-8-9 text-red-600">{errors.state}</p>
               )}
             </div>
-
-            {/* LGA */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="lga" className="text-12-14 font-semibold text-[#333333]">LGA</label>
+              <h2 className="text-12-14 font-semibold text-[#333333]">LGA</h2>
               <input
-                id="lga"
                 type="text"
                 name="lga"
-                placeholder="Enter LGA"
+                placeholder=""
                 value={values.lga}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.lga && touched.lga && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.lga as string}</p>
+                <p className="text-8-9 text-red-600">{errors.lga}</p>
               )}
             </div>
-
-            {/* Latitude */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="latitude" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Latitude
-              </label>
+              </h2>
               <input
-                id="latitude"
-                type="text" // Consider type="number" for direct numeric input, but handle parsing carefully
+                type="text"
                 name="latitude"
-                placeholder="Enter latitude"
+                placeholder=""
                 value={values.latitude}
                 onChange={(e) => {
                   const res = e.target.value.trim();
-                  if (res === "" || !isNaN(Number(res))) { // Allow empty or numeric
-                    setFieldValue("latitude", res);
-                  }
+                  if (isNaN(Number(res))) return;
+                  setFieldValue("latitude", res);
                 }}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.latitude && touched.latitude && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.latitude as string}</p>
+                <p className="text-8-9 text-red-600">{errors.latitude}</p>
               )}
             </div>
-
-            {/* Longitude */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="longitude" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Longitude
-              </label>
+              </h2>
               <input
-                id="longitude"
                 type="text"
                 name="longitude"
-                placeholder="Enter longitude"
+                placeholder=""
                 value={values.longitude}
                 onChange={(e) => {
                   const res = e.target.value.trim();
-                  if (res === "" || !isNaN(Number(res))) {
-                    setFieldValue("longitude", res);
-                  }
+                  if (isNaN(Number(res))) return;
+                  setFieldValue("longitude", res);
                 }}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.longitude && touched.longitude && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.longitude as string}</p>
+                <p className="text-8-9 text-red-600">{errors.longitude}</p>
               )}
             </div>
-
-            {/* Length (in metres) */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="pitchLength" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Length (in metres)
-              </label>
+              </h2>
               <input
-                id="pitchLength"
                 type="text"
                 name="pitchLength"
-                placeholder="e.g., 100"
+                placeholder=""
                 value={values.pitchLength}
                 onChange={(e) => {
                   const res = e.target.value.trim();
-                  if (res === "" || !isNaN(Number(res))) {
-                    setFieldValue("pitchLength", res);
-                  }
+                  if (isNaN(Number(res))) return;
+                  setFieldValue("pitchLength", res);
                 }}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.pitchLength && touched.pitchLength && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.pitchLength as string}</p>
+                <p className="text-8-9 text-red-600">{errors.pitchLength}</p>
               )}
             </div>
-
-            {/* Width (in meters) */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="width" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Width (in meters)
-              </label>
+              </h2>
               <input
-                id="width"
                 type="text"
                 name="width"
-                placeholder="e.g., 50"
+                placeholder=""
                 value={values.width}
                 onChange={(e) => {
                   const res = e.target.value.trim();
-                  if (res === "" || !isNaN(Number(res))) {
-                    setFieldValue("width", res);
-                  }
+                  if (isNaN(Number(res))) return;
+                  setFieldValue("width", res);
                 }}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.width && touched.width && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.width as string}</p>
+                <p className="text-8-9 text-red-600">{errors.width}</p>
               )}
             </div>
-
-            {/* Facilities */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="facilities" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Facilities
-              </label>
+              </h2>
               <select
-                id="facilities"
                 name="facilities"
-                value={values.facilities} // Controlled component
+                defaultValue={""}
                 onChange={handleChange}
-                onBlur={handleBlur}
+                value={values.facilities}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               >
-                <option value="" disabled>Select facilities rating</option>
+                <option value="">Select</option>
                 {facilitiesRatings.map((facility) => (
                   <option key={facility} value={facility}>
                     {facility}
@@ -356,49 +357,42 @@ const AddPitch = () => {
                 ))}
               </select>
               {errors.facilities && touched.facilities && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.facilities as string}</p>
+                <p className="text-8-9 text-red-600">{errors.facilities}</p>
               )}
             </div>
-
-            {/* Year of Establishment */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="year" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Year of Establishment
-              </label>
+              </h2>
               <input
-                id="year"
-                type="text" // Or "number" with min/max
+                type="text"
                 name="year"
-                placeholder="e.g., 2005"
+                placeholder=""
                 value={values.year}
                 onChange={(e) => {
                   const res = e.target.value.trim();
-                  if (res === "" || /^\d*$/.test(res)) { // Allow empty or only digits
-                    setFieldValue("year", res);
-                  }
+                  if (isNaN(Number(res))) return;
+                  setFieldValue("year", res);
                 }}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.year && touched.year && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.year as string}</p>
+                <p className="text-8-9 text-red-600">{errors.year}</p>
               )}
             </div>
-
-            {/* Surface */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="surface" className="text-12-14 font-semibold text-[#333333]">
+              <h2 className="text-12-14 font-semibold text-[#333333]">
                 Surface
-              </label>
+              </h2>
               <select
-                id="surface"
                 name="surface"
-                value={values.surface} // Controlled component
+                defaultValue={""}
                 onChange={handleChange}
-                onBlur={handleBlur}
+                value={values.surface}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               >
-                <option value="" disabled>Select surface type</option>
+                <option value="">Select</option>
                 {surfaceAreas.map((srf) => (
                   <option key={srf} value={srf}>
                     {srf}
@@ -406,46 +400,39 @@ const AddPitch = () => {
                 ))}
               </select>
               {errors.surface && touched.surface && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.surface as string}</p>
+                <p className="text-8-9 text-red-600">{errors.surface}</p>
               )}
             </div>
-
-            {/* Rating */}
             <div className="w-full flex flex-col gap-1">
-              <label htmlFor="rating" className="text-12-14 font-semibold text-[#333333]">
-                Rating (1-5)
-              </label>
+              <h2 className="text-12-14 font-semibold text-[#333333]">
+                Rating
+              </h2>
               <input
-                id="rating"
-                type="text" // Or "number" with min/max
+                type="text"
                 name="rating"
-                placeholder="e.g., 4"
+                placeholder=""
                 value={values.rating}
                 onChange={(e) => {
                   const res = e.target.value.trim();
-                  // Basic validation for a 1-5 rating or empty
-                  if (res === "" || (/^[1-5]$/.test(res) && res.length === 1)) {
-                     setFieldValue("rating", res);
-                  }
+                  if (isNaN(Number(res))) return;
+                  setFieldValue("rating", res);
                 }}
                 onBlur={handleBlur}
                 className="w-full rounded-lg border bg-white placeholder:text-placeholder text-dark text-14-16 font-semibold placeholder:text-opacity-[0.88] border-border-gray h-10 px-2"
               />
               {errors.rating && touched.rating && (
-                <p className="text-8-9 text-red-600 mt-1">{errors.rating as string}</p>
+                <p className="text-8-9 text-red-600">{errors.rating}</p>
               )}
             </div>
           </div>
-
-          {/* Submit Button */}
           <div className="w-full grid place-content-center mt-5">
             <button
               type="submit"
-              disabled={loading || uploadingLogo} // Disable button when loading
-              className="w-[160px] grid place-content-center rounded-md h-10 text-white bg-primary-2 disabled:opacity-50"
+              /* CHANGE 3: Button is full-width on mobile, fixed on medium+ screens */
+              className="w-full md:w-[160px] grid place-content-center rounded-md h-10 text-white bg-primary-2"
             >
               {loading || uploadingLogo ? (
-                <Loader color="white" size="sm" /> 
+                <Loader color="white.6" />
               ) : (
                 "Add Pitch"
               )}

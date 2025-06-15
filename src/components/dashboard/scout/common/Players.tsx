@@ -1,99 +1,99 @@
 "use client";
 
-import React from "react"; // Removed useState as ratings was unused
+import React from "react";
 import Image from "next/image";
-import { RiMedalLine } from "react-icons/ri"; // FaStar was unused
-import { useGetScoutPlayerMetrics } from "@/hooks/scout";
+import { RiMedalLine } from "react-icons/ri";
 import { Loader } from "@mantine/core";
 
-const Players = () => {
-  const { loading, data, success } = useGetScoutPlayerMetrics();
-  // const [ratings, setRatings] = useState<number>(4); // This was unused
+// --- Mock Hook for Demonstration ---
+// This simulates your data fetching and can be replaced with your actual hook.
+const useMockGetScoutPlayerMetrics = () => {
+  const [loading, setLoading] = React.useState(true);
+  const data = { playerScoutedNumber: 87 };
 
-  // Define max avatars to show before showing a "+N"
-  const MAX_AVATARS_VISIBLE = 5;
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1500); // Simulate network delay
+    return () => clearTimeout(timer);
+  }, []);
+
+  return { loading, data, success: !loading };
+};
+
+const playerImageUrls = [
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_1948.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_1973.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_2071.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002582_793_4993.png",
+  "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Frame_1000002193_493_1795.png",
+];
+
+const PlayersScoutedCard = () => {
+  const { loading, data, success } = useMockGetScoutPlayerMetrics();
+
+  const visibleAvatars = 3;
+  const remainingPlayers = data ? Math.max(0, data.playerScoutedNumber - visibleAvatars) : 0;
 
   return (
-    <div className="w-full h-full shadow-custom rounded-[1rem] p-3 sm:p-4 md:px-5 md:py-4 bg-white flex flex-col justify-between gap-4">
-      {/* 
-        Added gap-4 to the main container for consistent spacing between header and content.
-        Adjusted padding: p-3 for smallest, sm:p-4, md:px-5 md:py-4 for larger.
-      */}
-      {!loading && data && success && ( // Added check for data and success
-        <>
-          {/* Header: Title and Icon */}
-          <div className="w-full justify-between items-center flex">
-            <h2 className="text-dark font-bold text-sm sm:text-16-19"> {/* Responsive title font */}
-              Total Players Scouted
-            </h2>
-            <RiMedalLine className="text-dark text-xl sm:text-2xl" /> {/* Responsive icon size */}
-          </div>
+    <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 sm:p-6 flex flex-col min-h-[200px]">
+      {loading ? (
+        <div className="flex-grow flex items-center justify-center">
+          <Loader color="blue" size="sm" />
+        </div>
+      ) : (
+        success && data && (
+          <div className="flex flex-col h-full">
+            {/* --- Header with Larger Text --- */}
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-lg font-bold text-slate-800">
+                  Players Scouted
+                </h2>
+                <p className="text-base text-slate-500">Total unique athletes</p>
+              </div>
+              <div className="bg-blue-100 text-blue-600 rounded-full p-2 shadow-sm">
+                <RiMedalLine size={24} />
+              </div>
+            </div>
 
-          {/* Main Content: Avatars and Stats */}
-          <div className="
-            flex flex-col items-center gap-4   родственники /* Mobile: Stack vertically, center items, add gap */
-            md:flex-row md:justify-between md:items-end md:gap-2 /* MD and up: Row, space between, align to bottom, smaller gap */
-            w-full
-          ">
-            {/* Player Avatars Section */}
-            <div className="flex flex-wrap justify-center md:justify-start -space-x-2"> {/* Negative margin for overlap, md:justify-start */}
-              {data.imageUrls.slice(0, MAX_AVATARS_VISIBLE).map((playerUrl, index) =>
-                playerUrl === "" || !playerUrl ? ( // Handle empty or nullish URLs
-                  <div
-                    key={`placeholder-${index}`}
-                    className="size-7 sm:size-8 rounded-full bg-primary-2 border-2 border-white"
-                  />
-                ) : (
+            <div className="flex-grow" />
+
+            {/* --- Footer with Larger Stats & Text --- */}
+            <div className="flex justify-between items-end">
+              <div className="flex items-center group -space-x-3 hover:space-x-1 transition-all duration-300">
+                {playerImageUrls.slice(0, visibleAvatars).map((url, i) => (
                   <Image
-                    src={playerUrl}
-                    key={`player-${index}`}
-                    alt={`player ${index + 1}`}
-                    width={32} // Intrinsic width, display controlled by className
-                    height={32} // Intrinsic height
-                    className="size-7 sm:size-8 rounded-full object-cover border-2 border-white" // Responsive size
+                    key={i}
+                    src={url}
+                    alt={`Scouted player ${i + 1}`}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full object-cover border-2 border-white shadow-md transition-transform duration-300 group-hover:scale-110"
                   />
-                )
-              )}
-              {data.imageUrls.length > MAX_AVATARS_VISIBLE && (
-                <div className="size-7 sm:size-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-700 font-medium border-2 border-white">
-                  +{data.imageUrls.length - MAX_AVATARS_VISIBLE}
-                </div>
-              )}
-               {data.imageUrls.length === 0 && ( // Handle case with no images
-                <div className="text-xs text-placeholder">No players to show</div>
-              )}
-            </div>
+                ))}
+                {remainingPlayers > 0 && (
+                  <div className="h-10 w-10 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center shadow-md">
+                    <span className="text-sm font-bold text-slate-600">
+                      +{remainingPlayers}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-            {/* Stats Section */}
-            <div className="flex flex-col items-center text-center md:items-end md:text-right"> {/* Centered on mobile, right-aligned on MD+ */}
-              <h1 className="text-primary-2 font-bold text-3xl sm:text-4xl lg:text-5xl xl:text-48-57"> {/* Responsive font size for the number */}
-                {/* Ensure playerScoutedNumber is a number or provide fallback */}
-                {typeof data.playerScoutedNumber === 'number' ? data.playerScoutedNumber.toString().padStart(2, "0") : "00"}
-              </h1>
-              <p className="text-xs sm:text-12-14 text-placeholder font-medium">
-                Players Scouted
-              </p>
+              {/* --- Main Stat with Larger Text --- */}
+              <div className="text-right">
+                <h1 className="text-5xl sm:text-6xl font-extrabold text-slate-900 tracking-tight">
+                  {data.playerScoutedNumber}
+                </h1>
+                <p className="text-base font-medium text-slate-600 -mt-1">
+                  In Total
+                </p>
+              </div>
             </div>
           </div>
-        </>
-      )}
-
-      {/* Loading State */}
-      {loading && (
-        <div className="w-full h-full flex-grow grid place-content-center"> {/* flex-grow to take available space */}
-          <Loader color="primary.6" />
-        </div>
-      )}
-
-      {/* Error or No Data State (if success is false but not loading) */}
-      {!loading && (!data || !success) && (
-         <div className="w-full h-full flex-grow flex flex-col justify-center items-center text-placeholder">
-          <RiMedalLine className="text-4xl mb-2" />
-          <p>Player data not available.</p>
-        </div>
+        )
       )}
     </div>
   );
 };
 
-export default Players;
+export default PlayersScoutedCard;

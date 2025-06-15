@@ -7,41 +7,20 @@ import CreateNewPost from "./CreateNewPost";
 
 const Spotlight = () => {
   return (
-    <div className="w-full p-3 sm:p-4 md:p-5 xl:p-6 gap-3 sm:gap-4 md:gap-5 xl:gap-6">
-      {/* Mobile & Small Tablet Layout - Single Column */}
-      <div className="xl:hidden w-full flex flex-col gap-3 sm:gap-4 md:gap-5">
+    // 1. Adjusted padding for mobile and changed the grid layout
+    <div className="w-full p-4 md:p-6 gap-6 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
+      {/* This is the main content column, it will appear on top on mobile */}
+      <div className="w-full flex flex-col gap-6">
         <CreateNewPost />
-        
-        {/* Mobile Feeds - Show at top on mobile for better engagement */}
-        <div className="sm:hidden">
-          <Feeds />
-        </div>
-        
         <Posts currentPlayer={false} />
-        
-        {/* Tablet/Small Laptop Feeds - Show after posts */}
-        <div className="hidden sm:block xl:hidden">
-          <Feeds />
-        </div>
-        
-        {/* Mobile/Tablet/Small Laptop Ads - Show at bottom */}
-        <div className="xl:hidden">
-          <Ads />
-        </div>
       </div>
 
-      {/* Large Desktop Layout - Two Columns */}
-      <div className="hidden xl:grid xl:grid-cols-[2fr_1fr] xl:gap-6 w-full">
-        <div className="w-full flex flex-col gap-6">
-          <CreateNewPost />
-          <Posts currentPlayer={false} />
-        </div>
-
-        <div className="flex flex-col gap-6 w-full">
-          <Feeds />
-          <div className="sticky top-20 self-start">
-            <Ads />
-          </div>
+      {/* This is the sidebar column, it will stack below the main content on mobile */}
+      <div className="flex flex-col gap-6 w-full">
+        <Feeds />
+        {/* 2. Made the 'Ads' component sticky only on large screens */}
+        <div className="lg:sticky lg:top-20 lg:self-start">
+          <Ads />
         </div>
       </div>
     </div>

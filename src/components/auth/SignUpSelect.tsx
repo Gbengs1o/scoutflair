@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CoachSignUp from "./coach/CoachSignUp";
 import PlayerSignUp from "./player/PlayerSignUp";
@@ -8,7 +8,6 @@ import ScoutSignUp from "./scout/ScoutSignUp";
 import Swal from "sweetalert2";
 import Image from "next/image";
 
-import checkmark from "@/public/icons/assets/checkmark.svg";
 import playerImage from "@/public/images/_f01daf4f-70cd-44e5-ab9e-c269eb91d927-1.png";
 import scoutImage from "@/public/images/_f01daf4f-70cd-44e5-ab9e-c269eb91d927-3.png";
 import coachImage from "@/public/images/_a886120b-a28a-42e2-b365-d2435d9da6f5.png";
@@ -18,6 +17,44 @@ const Home: React.FC = () => {
   const [type, setType] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const [selectionStyle, setSelectionStyle] = useState({
+    opacity: 0,
+    width: "0px",
+    height: "0px",
+    transform: "translateX(0px)",
+  });
+
+  const optionsContainerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
+  const coachRef = useRef<HTMLDivElement>(null);
+  const scoutRef = useRef<HTMLDivElement>(null);
+
+  const pathRefs: { [key: string]: React.RefObject<HTMLDivElement> } = {
+    player: playerRef,
+    coach: coachRef,
+    scout: scoutRef,
+  };
+
+  useEffect(() => {
+    if (selectedPath && pathRefs[selectedPath]?.current && optionsContainerRef.current) {
+      const selectedElement = pathRefs[selectedPath].current;
+      const containerRect = optionsContainerRef.current.getBoundingClientRect();
+      const selectedRect = selectedElement.getBoundingClientRect();
+      
+      const relativeTop = selectedRect.top - containerRect.top;
+      const relativeLeft = selectedRect.left - containerRect.left;
+
+      setSelectionStyle({
+        opacity: 1,
+        width: `${selectedRect.width}px`,
+        height: `${selectedRect.height}px`,
+        transform: `translate(${relativeLeft}px, ${relativeTop}px)`,
+      });
+    } else {
+      setSelectionStyle(prev => ({ ...prev, opacity: 0 }));
+    }
+  }, [selectedPath]);
 
   useEffect(() => {
     const paramType = searchParams.get("type");
@@ -54,10 +91,19 @@ const Home: React.FC = () => {
               "linear-gradient(135.01deg, rgba(248,248,255,0.96) -38.3%, rgba(25,43,77,0.48) 201.74%)",
           }}
         >
-          <div className="flex flex-col lg:flex-row justify-center items-center gap-8 lg:gap-16 p-4 lg:p-12">
+          <div
+            ref={optionsContainerRef}
+            className="relative flex flex-col lg:flex-row justify-center items-center gap-8 lg:gap-16 p-4 lg:p-12"
+          >
+            <div
+              className="absolute top-0 left-0 rounded-2xl border-2 border-[#f2a725] transition-all duration-500 ease-in-out pointer-events-none"
+              style={selectionStyle}
+            />
+
             {/* Player Section */}
             <div
-              className={`flex flex-col justify-start items-center gap-4 p-4 cursor-pointer}`}
+              ref={playerRef}
+              className={`flex flex-col justify-start items-center gap-4 p-4 cursor-pointer z-10`}
               onClick={() => handleDivClick("player")}
             >
               <div className="relative w-32 h-32 lg:w-40 lg:h-40">
@@ -68,13 +114,6 @@ const Home: React.FC = () => {
                     alt="player"
                   />
                 </div>
-                {selectedPath === "player" && (
-                  <Image
-                    className="w-6 h-6 absolute bottom-0 right-0"
-                    src={checkmark}
-                    alt="selected"
-                  />
-                )}
               </div>
               <div className="flex flex-col justify-start items-center gap-2">
                 <p className="text-lg font-bold text-center text-black/[0.72]">
@@ -89,7 +128,8 @@ const Home: React.FC = () => {
 
             {/* Coach Section */}
             <div
-              className={`flex flex-col justify-start items-center gap-4 p-4 rounded-lg cursor-pointer }`}
+              ref={coachRef}
+              className={`flex flex-col justify-start items-center gap-4 p-4 cursor-pointer z-10`}
               onClick={() => handleDivClick("coach")}
             >
               <div className="relative w-32 h-32 lg:w-40 lg:h-40">
@@ -100,13 +140,6 @@ const Home: React.FC = () => {
                     alt="coach"
                   />
                 </div>
-                {selectedPath === "coach" && (
-                  <Image
-                    className="w-6 h-6 absolute bottom-0 right-0"
-                    src={checkmark}
-                    alt="selected"
-                  />
-                )}
               </div>
               <div className="flex flex-col justify-start items-center gap-2">
                 <p className="text-lg font-bold text-center text-black">
@@ -120,7 +153,8 @@ const Home: React.FC = () => {
 
             {/* Scout Section */}
             <div
-              className={`flex flex-col justify-start items-center gap-4 p-4 cursor-pointer }`}
+              ref={scoutRef}
+              className={`flex flex-col justify-start items-center gap-4 p-4 cursor-pointer z-10`}
               onClick={() => handleDivClick("scout")}
             >
               <div className="relative w-32 h-32 lg:w-40 lg:h-40">
@@ -131,18 +165,12 @@ const Home: React.FC = () => {
                     alt="scout"
                   />
                 </div>
-                {selectedPath === "scout" && (
-                  <Image
-                    className="w-6 h-6 absolute bottom-0 right-0"
-                    src={checkmark}
-                    alt="selected"
-                  />
-                )}
               </div>
               <div className="flex flex-col justify-start items-center gap-2">
                 <p className="text-lg font-bold text-center text-black/[0.72]">
                   Scout
                 </p>
+                {/* THIS IS THE FIXED LINE */}
                 <p className="w-full lg:w-[177px] text-sm text-center text-black/[0.72]">
                   Provide recommendations for recruitment and team development.
                 </p>
