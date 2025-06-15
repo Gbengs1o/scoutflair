@@ -12,38 +12,33 @@ import ProfileImageOrTextAvatar from "@/components/reusable/ProfileImageOrTextAv
 const roles = ["Goalkeeper", "Defender", "Midfielder", "Forward", "Winger"];
 
 // Function to get a random item from an array
-// CORRECTED: Added generic types. <T> means this function can work with any type of array.
-const getRandomItem = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+// CORRECTED: Changed to a standard function declaration to avoid JSX syntax ambiguity with <T>.
+function getRandomItem<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
 // Function to get a random number in a given range (inclusive)
-// CORRECTED: Added 'number' types to the parameters and the return value.
+// This function was already correct from the last fix.
 const getRandomNumber = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
 
 const Banner = () => {
-  // We still get the user's static info from the store
   const image = useCurrentUserStore((state) => state.image);
   const name = useCurrentUserStore((state) => state.name);
 
-  // --- State for our dynamic player data ---
-  // We initialize the state with random values so it looks good on the first render
-  const [role, setRole] = useState(getRandomItem(roles));
-  const [jersey, setJersey] = useState(getRandomNumber(1, 99));
-  const [age, setAge] = useState(getRandomNumber(18, 38)); // Realistic age for a player
+  const [role, setRole] = useState(() => getRandomItem(roles));
+  const [jersey, setJersey] = useState(() => getRandomNumber(1, 99));
+  const [age, setAge] = useState(() => getRandomNumber(18, 38));
 
-  // This effect will run once when the component mounts
   useEffect(() => {
-    // Set up an interval to update the data every 15 seconds
     const intervalId = setInterval(() => {
       setRole(getRandomItem(roles));
       setJersey(getRandomNumber(1, 99));
       setAge(getRandomNumber(18, 38));
-    }, 15000); // 15000 milliseconds = 15 seconds
+    }, 15000);
 
-    // This is a cleanup function.
-    // React runs this when the component is unmounted to prevent memory leaks.
     return () => clearInterval(intervalId);
-  }, []); // The empty dependency array [] ensures this effect runs only once.
+  }, []);
 
 
   return (
@@ -54,7 +49,7 @@ const Banner = () => {
         className="w-full h-44 object-cover"
         width={300}
         height={120}
-        priority // Consider adding priority if this is an "above the fold" image
+        priority
       />
       <div className="w-full flex flex-col relative pt-12 pb-6">
         <div className="absolute -top-6 left-4 -translate-y-1/2">
@@ -70,7 +65,6 @@ const Banner = () => {
           <h2 className="text-20-24 font-bold text-dark">{name}</h2>
           <div className="text-placeholder text-14-16 font-medium">
             <p>
-              {/* These now use our local state variables */}
               {role}, No. {jersey}
             </p>
             <p>{age} yrs</p>
