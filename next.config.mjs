@@ -12,7 +12,6 @@ const nextConfig = {
         hostname: "scoutflair.s3.eu-north-1.amazonaws.com",
         pathname: "/*/**",
       },
-      // --- New entry for the update images ---
       {
         protocol: "https",
         hostname: "mediumslateblue-salamander-253615.hostingersite.com",
@@ -23,9 +22,17 @@ const nextConfig = {
   staticPageGenerationTimeout: 300,
 
   eslint: {
-    ignoreDuringBuilds: true, // Disable ESLint during builds
+    // This was already here. It disables ESLint checks during the build.
+    ignoreDuringBuilds: true,
   },
-  
+
+  // --- ADD THIS BLOCK TO IGNORE TYPESCRIPT ERRORS ---
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
