@@ -2,24 +2,57 @@
 
 import React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+// We already have these icons, which is great!
 import { IoMdNotificationsOutline } from "react-icons/io";
-import { IoSearchOutline, IoChevronDownCircleOutline } from "react-icons/io5";
+import { IoSearchOutline } from "react-icons/io5";
 
 import ProfileImageOrTextAvatar from "./ProfileImageOrTextAvatar";
 import { useCurrentUserStore } from "@/stores/userStore";
 import { Urls } from "@/constants/constants";
+
+const GoBackButton: React.FC<{ label: string; onClick: () => void }> = ({
+  label,
+  onClick,
+}) => (
+  <button
+    onClick={onClick}
+    className="px-4 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full text-sm font-semibold transition-colors duration-200"
+  >
+    {label}
+  </button>
+);
 
 const TopBar: React.FC<{ toggleSidebar: () => void }> = ({
   toggleSidebar,
 }) => {
   const [show, setShow] = React.useState(false);
   const toggle = () => setShow((prev) => !prev);
+
   const role = useCurrentUserStore((state) => state.role);
   const image = useCurrentUserStore((state) => state.image);
   const names = useCurrentUserStore((state) => state.name);
 
   const router = useRouter();
+  const pathname = usePathname();
+
+  const hasSwitched =
+    (role === "PLAYER" && pathname.startsWith("/dashboard/scout")) ||
+    (role === "SCOUT" && pathname.startsWith("/dashboard/player"));
+
+  const getOriginalDashboardUrl = () => {
+    if (role === "PLAYER") return Urls.PLAYER_SPOTLIGHT;
+    if (role === "SCOUT") return Urls.SCOUT_OVERVIEW;
+    return "/";
+  };
+
+  const getDisplayedRole = () => {
+    if (pathname.startsWith("/dashboard/scout")) return "SCOUT";
+    if (pathname.startsWith("/dashboard/player")) return "PLAYER";
+    return role;
+  };
+
+  const displayedRole = getDisplayedRole();
 
   const switchRole = () => {
     if (role === "SCOUT") {
@@ -39,39 +72,40 @@ const TopBar: React.FC<{ toggleSidebar: () => void }> = ({
         className="text-gray-700 p-2 -ml-2 lg:hidden"
         aria-label="Open sidebar"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
       </button>
 
-      {/* Right side content, pushed to the right */}
-      <div className="flex items-center gap-4 sm:gap-8 ml-auto">
-        {/*
-        <div className="relative w-full max-w-xs hidden md:block">
-            <input
-            className="h-10 rounded-full w-full border pl-11 bg-[#F5F6FA] pr-4 text-sm border-border-gray placeholder:text-placeholder font-lato text-dark"
-            placeholder="Search"
-            />
-            <IoSearchOutline className="absolute inset-y-1/2 -translate-y-1/2 left-4 text-xl text-placeholder" />
-        </div>
-        */}
+      {/* --- START: NEW SEARCH INPUT --- */}
+      {/* This search bar is hidden on mobile (md) and takes available space on larger screens */}
+      <div className="relative flex-1 max-w-sm hidden md:block mx-8">
+        <input
+          className="h-10 rounded-full w-full border border-[#D5D5D5] pl-11 bg-[#F5F6FA] pr-4 text-sm placeholder:text-gray-500/50 font-lato text-dark"
+          placeholder="Search"
+        />
+        <IoSearchOutline className="absolute inset-y-1/2 -translate-y-1/2 left-4 text-xl text-gray-500/50" />
+      </div>
+      {/* --- END: NEW SEARCH INPUT --- */}
 
-        {/*
-        <div className="w-fit flex gap-8 items-center">
-          <IoMdNotificationsOutline className="text-2xl text-black" />
-        </div>
-        */}
+      {/* Right side content, pushed to the right */}
+      <div className="flex items-center gap-4 sm:gap-6 ml-auto">
+        {hasSwitched && (
+          <GoBackButton
+            label={`Back to ${role}`}
+            onClick={() => router.push(getOriginalDashboardUrl())}
+          />
+        )}
+
+        {/* --- START: NEW NOTIFICATION ICON --- */}
+        <button className="relative text-gray-800 hover:text-black transition-colors">
+          <IoMdNotificationsOutline className="h-7 w-7" />
+          {/* Notification Dot with Count */}
+          <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#F93C65] text-[10px] font-bold text-white">
+            6
+          </span>
+        </button>
+        {/* --- END: NEW NOTIFICATION ICON --- */}
 
         <div className="flex gap-3 items-center w-fit relative">
           <ProfileImageOrTextAvatar
@@ -85,7 +119,9 @@ const TopBar: React.FC<{ toggleSidebar: () => void }> = ({
             <h3 className="text-dark font-lato font-bold text-14-16">
               {names}
             </h3>
-            <p className="text-placeholder text-12-14 font-semibold">{role}</p>
+            <p className="text-placeholder text-12-14 font-semibold">
+              {displayedRole}
+            </p>
           </div>
 
           {show && (

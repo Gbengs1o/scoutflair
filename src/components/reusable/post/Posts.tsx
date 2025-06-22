@@ -20,7 +20,7 @@ const avatarImagePool = [
   "https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/06/C__Users_USER_Pictures_site2_Saudi_arabia_heart_flag_793_4461-1.png",
 ];
 
-const namePool = [ "Luka Modrić", "Cristiano Ronaldo", "Alex Morgan", "Kylian Mbappé", "Sam Kerr", "Lionel Messi", ];
+const namePool = [ "Emmanuel Ogundare", "Ogunkoya Dvid", "Getrude Trent", "leo camp", "Sam Kerr", "Kasim Segun", "John Bull", ];
 
 const textPool = [
   "Just finished a great training session! Feeling ready for the next match. #Hustle",
@@ -80,7 +80,7 @@ const Posts: FC = () => {
     createAndSetPosts();
 
     // Set interval to regenerate posts every 5 seconds
-    const intervalId = setInterval(createAndSetPosts, 5000);
+    const intervalId = setInterval(createAndSetPosts, 20000);
 
     // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(intervalId);
